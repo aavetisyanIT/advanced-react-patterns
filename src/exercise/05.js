@@ -4,14 +4,22 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 
-const callAll = (...fns) => (...args) => fns.forEach(fn => fn?.(...args))
+const callAll =
+  (...fns) =>
+  (...args) =>
+    fns.forEach(fn => fn?.(...args))
+
+const reducerTypes = {
+  toggle: 'toggle',
+  reset: 'reset',
+}
 
 function toggleReducer(state, {type, initialState}) {
   switch (type) {
-    case 'toggle': {
+    case reducerTypes.toggle: {
       return {on: !state.on}
     }
-    case 'reset': {
+    case reducerTypes.reset: {
       return initialState
     }
     default: {
@@ -21,16 +29,14 @@ function toggleReducer(state, {type, initialState}) {
 }
 
 // 🐨 add a new option called `reducer` that defaults to `toggleReducer`
-function useToggle({initialOn = false} = {}) {
+function useToggle({initialOn = false} = {}, reducer = toggleReducer) {
   const {current: initialState} = React.useRef({on: initialOn})
-  // 🐨 instead of passing `toggleReducer` here, pass the `reducer` that's
-  // provided as an option
-  // ... and that's it! Don't forget to check the 💯 extra credit!
-  const [state, dispatch] = React.useReducer(toggleReducer, initialState)
+
+  const [state, dispatch] = React.useReducer(reducer, initialState)
   const {on} = state
 
-  const toggle = () => dispatch({type: 'toggle'})
-  const reset = () => dispatch({type: 'reset', initialState})
+  const toggle = () => dispatch({type: reducerTypes.toggle})
+  const reset = () => dispatch({type: reducerTypes.reset, initialState})
 
   function getTogglerProps({onClick, ...props} = {}) {
     return {
